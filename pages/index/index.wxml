@@ -1,0 +1,59 @@
+<view class="shell">
+  <view class="card hero">
+    <view class="hero-copy">
+      <text class="hero-title">Snake Support</text>
+      <text class="subtitle muted">Play inside WeChat, beat your best score, and support the project with a WeChat Pay donation.</text>
+    </view>
+
+    <view class="stats">
+      <view class="stat">
+        <text class="stat-label muted">Score</text>
+        <text class="stat-value">{{score}}</text>
+      </view>
+      <view class="stat">
+        <text class="stat-label muted">Best</text>
+        <text class="stat-value">{{bestScore}}</text>
+      </view>
+      <view class="stat">
+        <text class="stat-label muted">State</text>
+        <text class="stat-value small">{{gameStateLabel}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card board-wrap">
+    <view class="board">
+      <block wx:for="{{board}}" wx:key="id">
+        <view class="board-row">
+          <block wx:for="{{item.cells}}" wx:key="id">
+            <view class="cell {{item.type}}"></view>
+          </block>
+        </view>
+      </block>
+    </view>
+    <text class="board-hint muted">{{statusText}}</text>
+  </view>
+
+  <view class="actions">
+    <button class="primary-btn action-btn" bindtap="handleStartPause">{{actionButtonLabel}}</button>
+    <button class="secondary-btn action-btn" bindtap="resetGame">Reset</button>
+    <button class="secondary-btn action-btn" bindtap="goSupport">Donate</button>
+  </view>
+
+  <view class="card controls">
+    <text class="section-title">Controls</text>
+    <view class="dpad">
+      <button class="secondary-btn pad up" data-direction="up" bindtap="turn">Up</button>
+      <view class="middle-row">
+        <button class="secondary-btn pad" data-direction="left" bindtap="turn">Left</button>
+        <button class="secondary-btn pad" data-direction="down" bindtap="turn">Down</button>
+        <button class="secondary-btn pad" data-direction="right" bindtap="turn">Right</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="card support-banner" bindtap="goSupport">
+    <text class="section-title">Support this mini-program</text>
+    <text class="muted">Open the donation page to test WeChat Pay support tiers and custom amounts.</text>
+  </view>
+</view>

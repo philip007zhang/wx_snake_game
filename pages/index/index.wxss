@@ -1,0 +1,138 @@
+.hero {
+  padding: 32rpx;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.stats {
+  margin-top: 28rpx;
+  display: flex;
+  gap: 16rpx;
+}
+
+.stat {
+  flex: 1;
+  padding: 22rpx;
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.stat-label {
+  font-size: 22rpx;
+}
+
+.stat-value {
+  font-size: 42rpx;
+  font-weight: 700;
+}
+
+.stat-value.small {
+  font-size: 26rpx;
+}
+
+.board-wrap {
+  margin-top: 24rpx;
+  padding: 24rpx;
+}
+
+.board {
+  padding: 14rpx;
+  border-radius: 28rpx;
+  background:
+    linear-gradient(180deg, rgba(34, 197, 94, 0.14), rgba(15, 23, 42, 0.2)),
+    #06101d;
+}
+
+.board-row {
+  display: flex;
+}
+
+.cell {
+  width: calc((100vw - 148rpx) / 12);
+  height: calc((100vw - 148rpx) / 12);
+  max-width: 46rpx;
+  max-height: 46rpx;
+  margin: 4rpx;
+  border-radius: 12rpx;
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.cell.food {
+  background: linear-gradient(135deg, #f97316, #ef4444);
+  box-shadow: 0 0 18rpx rgba(249, 115, 22, 0.48);
+}
+
+.cell.body {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+}
+
+.cell.head {
+  background: linear-gradient(135deg, #fde047, #22c55e);
+  box-shadow: 0 0 20rpx rgba(253, 224, 71, 0.42);
+}
+
+.board-hint {
+  display: block;
+  margin-top: 18rpx;
+  text-align: center;
+  font-size: 25rpx;
+}
+
+.actions {
+  margin-top: 24rpx;
+  display: flex;
+  gap: 16rpx;
+}
+
+.action-btn {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.controls {
+  margin-top: 24rpx;
+  padding: 28rpx;
+}
+
+.dpad {
+  margin-top: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.middle-row {
+  width: 100%;
+  display: flex;
+  gap: 16rpx;
+}
+
+.pad {
+  flex: 1;
+  min-width: 0;
+}
+
+.up {
+  width: 35%;
+}
+
+.support-banner {
+  margin-top: 24rpx;
+  padding: 28rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}

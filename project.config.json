@@ -1,0 +1,22 @@
+{
+  "description": "WeChat Mini Program snake game with donation support",
+  "packOptions": {
+    "ignore": []
+  },
+  "setting": {
+    "bundle": false,
+    "userConfirmedBundleSwitch": false,
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "compileHotReLoad": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.6.4",
+  "appid": "touristappid",
+  "projectname": "wx_snake_game",
+  "simulatorType": "wechat",
+  "condition": {}
+}

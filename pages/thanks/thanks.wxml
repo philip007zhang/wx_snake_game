@@ -1,0 +1,13 @@
+<view class="shell">
+  <view class="card thank-you">
+    <text class="hero-title">Thank you</text>
+    <text class="muted copy">Your support helps keep this WeChat Mini Program improving.</text>
+
+    <view class="receipt">
+      <text class="receipt-line">Amount: ¥{{amountYuan}}</text>
+      <text class="receipt-line">Order: {{tradeNo}}</text>
+    </view>
+
+    <button class="primary-btn cta" bindtap="playAgain">Back To Game</button>
+  </view>
+</view>

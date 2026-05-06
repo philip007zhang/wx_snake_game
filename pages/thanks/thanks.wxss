@@ -1,0 +1,29 @@
+.thank-you {
+  margin-top: 120rpx;
+  padding: 40rpx 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.copy {
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.receipt {
+  margin-top: 14rpx;
+  padding: 24rpx;
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.receipt-line {
+  display: block;
+  margin-top: 10rpx;
+  word-break: break-all;
+}
+
+.cta {
+  margin-top: 18rpx;
+}

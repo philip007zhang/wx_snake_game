@@ -1,0 +1,84 @@
+.support-hero,
+.tier-panel,
+.custom-panel,
+.note-panel {
+  padding: 30rpx;
+}
+
+.summary {
+  margin-top: 14rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.tier-panel,
+.custom-panel,
+.note-panel {
+  margin-top: 24rpx;
+}
+
+.tier-grid {
+  margin-top: 22rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.tier {
+  width: calc(50% - 8rpx);
+  box-sizing: border-box;
+  padding: 24rpx;
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2rpx solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.tier.selected {
+  border-color: rgba(34, 197, 94, 0.9);
+  box-shadow: 0 0 0 2rpx rgba(34, 197, 94, 0.12);
+}
+
+.tier-amount {
+  font-size: 42rpx;
+  font-weight: 700;
+}
+
+.tier-label {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.tier-desc {
+  font-size: 22rpx;
+  line-height: 1.5;
+}
+
+.amount-input {
+  margin-top: 20rpx;
+  height: 90rpx;
+  padding: 0 24rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.08);
+  color: #eff6ff;
+}
+
+.field-help,
+.status-note {
+  display: block;
+  margin-top: 14rpx;
+  font-size: 24rpx;
+}
+
+.note-line {
+  display: block;
+  margin-top: 16rpx;
+  line-height: 1.6;
+}
+
+.donate-btn {
+  margin-top: 28rpx;
+  font-size: 30rpx;
+}

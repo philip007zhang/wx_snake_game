@@ -1,0 +1,44 @@
+<view class="shell">
+  <view class="card support-hero">
+    <text class="hero-title">Support The Game</text>
+    <text class="muted summary">Send a WeChat Pay donation from inside the Mini Program. Your best score today: {{score}}.</text>
+  </view>
+
+  <view class="card tier-panel">
+    <text class="section-title">Pick a support tier</text>
+    <view class="tier-grid">
+      <block wx:for="{{tiers}}" wx:key="amountFen">
+        <view class="tier {{selectedAmountFen === item.amountFen ? 'selected' : ''}}" data-amount="{{item.amountFen}}" bindtap="selectTier">
+          <text class="tier-amount">¥{{item.amountYuan}}</text>
+          <text class="tier-label">{{item.label}}</text>
+          <text class="muted tier-desc">{{item.description}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="card custom-panel">
+    <text class="section-title">Or enter a custom amount</text>
+    <input
+      class="amount-input"
+      type="digit"
+      placeholder="For example 12.88"
+      value="{{customAmountYuan}}"
+      bindinput="handleCustomAmountInput"
+    />
+    <text class="muted field-help">Amounts are in CNY and converted to fen before payment.</text>
+  </view>
+
+  <view class="card note-panel">
+    <text class="section-title">What happens next</text>
+    <text class="muted note-line">1. The cloud function creates a WeChat Pay order.</text>
+    <text class="muted note-line">2. The Mini Program calls `wx.requestPayment`.</text>
+    <text class="muted note-line">3. The app verifies the order status with the merchant API.</text>
+  </view>
+
+  <button class="primary-btn donate-btn" loading="{{busy}}" disabled="{{busy}}" bindtap="donateNow">
+    {{busy ? 'Preparing payment...' : 'Donate with WeChat Pay'}}
+  </button>
+
+  <text wx:if="{{statusNote}}" class="status-note muted">{{statusNote}}</text>
+</view>
