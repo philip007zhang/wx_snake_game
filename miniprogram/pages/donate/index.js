@@ -23,7 +23,7 @@ Page({
         data: {
           action: 'createOrder',
           amount,
-          description: 'Support wx_snake_game'
+          description: 'Support WeChat Snake Game'
         }
       });
 
