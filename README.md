@@ -9,5 +9,5 @@ WeChat Mini Program scaffold including:
 ## Test
 
 ```bash
-node --test /home/runner/work/wx_snake_game/wx_snake_game/test/pay.function.test.js
+node --test test/pay.function.test.js
 ```
