@@ -120,7 +120,7 @@ Page({
         x: Math.floor(Math.random() * GRID_SIZE),
         y: Math.floor(Math.random() * GRID_SIZE)
       };
-    } while (this.snake && this.snake.some((part) => part.x === food.x && part.y === food.y));
+    } while (this.snake.some((part) => part.x === food.x && part.y === food.y));
     return food;
   },
 

@@ -61,7 +61,7 @@ function verifyOrder(event) {
   };
 }
 
-async function main(event = {}) {
+function main(event = {}) {
   const { OPENID } = cloud.getWXContext();
 
   if (event.action === 'createOrder') {
