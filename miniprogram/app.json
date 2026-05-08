@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "pages/snake/index",
+    "pages/donate/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "Snake Game",
+    "navigationBarBackgroundColor": "#1f1f1f",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f7f8fa"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

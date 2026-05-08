@@ -1,0 +1,61 @@
+.container {
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.board {
+  width: 600rpx;
+  height: 600rpx;
+  display: flex;
+  flex-wrap: wrap;
+  border: 4rpx solid #333;
+  border-radius: 8rpx;
+  background: #fff;
+}
+
+.cell {
+  width: 30rpx;
+  height: 30rpx;
+  box-sizing: border-box;
+  border: 1rpx solid #f0f0f0;
+}
+
+.cell.snake {
+  background: #4caf50;
+}
+
+.cell.head {
+  background: #2e7d32;
+}
+
+.cell.food {
+  background: #ff5252;
+}
+
+.controls,
+.direction-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  align-items: center;
+}
+
+.middle-row {
+  display: flex;
+  gap: 12rpx;
+}

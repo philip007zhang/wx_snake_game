@@ -1,0 +1,17 @@
+<view class="container">
+  <view class="panel">
+    <text class="title">Support this project</text>
+    <text class="desc">Your donation helps keep the snake game improving.</text>
+
+    <input
+      class="amount-input"
+      type="digit"
+      value="{{amount}}"
+      bindinput="onAmountInput"
+      placeholder="Enter amount in CNY"
+    />
+
+    <button type="primary" loading="{{loading}}" bindtap="donate">Donate with WeChat Pay</button>
+    <text class="hint">In development tools, payment may fail without a real merchant setup.</text>
+  </view>
+</view>

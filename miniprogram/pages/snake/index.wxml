@@ -1,0 +1,28 @@
+<view class="container">
+  <view class="panel">
+    <text class="title">WeChat Snake</text>
+    <text class="score">Score: {{score}}</text>
+    <text class="status">{{statusText}}</text>
+  </view>
+
+  <view class="board">
+    <block wx:for="{{cells}}" wx:key="index">
+      <view class="cell {{item.type}}"></view>
+    </block>
+  </view>
+
+  <view class="controls">
+    <button size="mini" type="primary" bindtap="startGame">Start</button>
+    <button size="mini" bindtap="pauseGame">Pause</button>
+    <button size="mini" bindtap="restartGame">Restart</button>
+  </view>
+
+  <view class="direction-pad">
+    <button size="mini" data-direction="up" bindtap="changeDirection">↑</button>
+    <view class="middle-row">
+      <button size="mini" data-direction="left" bindtap="changeDirection">←</button>
+      <button size="mini" data-direction="right" bindtap="changeDirection">→</button>
+    </view>
+    <button size="mini" data-direction="down" bindtap="changeDirection">↓</button>
+  </view>
+</view>
