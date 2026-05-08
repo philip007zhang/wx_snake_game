@@ -27,7 +27,7 @@ Page({
         }
       });
 
-      const { orderId, payment } = createRes.result || {};
+      const { orderId, payment } = createRes?.result || {};
       if (!orderId || !payment) {
         throw new Error('Invalid createOrder response');
       }
