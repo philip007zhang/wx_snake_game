@@ -46,7 +46,7 @@ Page({
       wx.showToast({ title: 'Thanks for your support!', icon: 'success' });
     } catch (error) {
       wx.showToast({
-        title: error && error.errMsg ? error.errMsg : 'Payment failed',
+        title: error?.errMsg || 'Payment failed',
         icon: 'none'
       });
     } finally {
