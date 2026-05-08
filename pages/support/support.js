@@ -1,3 +1,11 @@
+const {
+  LANGUAGE_OPTIONS,
+  formatText,
+  getLanguage,
+  getPageText,
+  setLanguage
+} = require("../../utils/i18n");
+
 function toFen(amountText) {
   if (!amountText) {
     return 0;
@@ -25,20 +33,66 @@ Page({
     score: 0,
     busy: false,
     statusNote: "",
+    summaryText: "",
     customAmountYuan: "",
     selectedAmountFen: 1800,
-    tiers: [
-      { label: "Small Thank You", amountFen: 600, amountYuan: "6.00", description: "Buy the game a coffee." },
-      { label: "Snack Tier", amountFen: 1800, amountYuan: "18.00", description: "A bigger show of support." },
-      { label: "Champion", amountFen: 5000, amountYuan: "50.00", description: "Back future updates." },
-      { label: "Legend", amountFen: 8800, amountYuan: "88.00", description: "Maximum visible support." }
-    ]
+    language: "en",
+    languageOptions: LANGUAGE_OPTIONS,
+    commonText: {},
+    text: {},
+    tiers: []
   },
 
   onLoad(options) {
+    this.language = getLanguage();
     this.setData({
       score: Number(options.score || 0)
     });
+    this.applyLanguage();
+  },
+
+  onShow() {
+    const latestLanguage = getLanguage();
+    if (latestLanguage !== this.language) {
+      this.language = latestLanguage;
+      this.applyLanguage();
+    }
+  },
+
+  applyLanguage() {
+    const locale = getPageText(this.language, "support");
+    const commonText = locale.common;
+    const text = locale.page;
+    const app = getApp();
+    app.globalData.language = this.language;
+
+    wx.setNavigationBarTitle({
+      title: text.navTitle
+    });
+
+    this.setData({
+      language: this.language,
+      languageOptions: LANGUAGE_OPTIONS,
+      commonText,
+      text,
+      summaryText: formatText(text.summary, { score: this.data.score || 0 }),
+      tiers: [
+        { label: text.smallThanks, amountFen: 600, amountYuan: "6.00", description: text.smallThanksDesc },
+        { label: text.snackTier, amountFen: 1800, amountYuan: "18.00", description: text.snackTierDesc },
+        { label: text.champion, amountFen: 5000, amountYuan: "50.00", description: text.championDesc },
+        { label: text.legend, amountFen: 8800, amountYuan: "88.00", description: text.legendDesc }
+      ]
+    });
+  },
+
+  switchLanguage(event) {
+    const nextLanguage = event.currentTarget.dataset.language;
+    if (!nextLanguage || nextLanguage === this.language) {
+      return;
+    }
+
+    this.language = setLanguage(nextLanguage);
+    this.applyLanguage();
   },
 
   selectTier(event) {
@@ -60,9 +114,11 @@ Page({
 
   async donateNow() {
     const amountFen = this.getSelectedAmountFen();
+    const text = this.data.text;
+
     if (amountFen <= 0) {
       wx.showToast({
-        title: "Enter a valid amount",
+        title: text.invalidAmount,
         icon: "none"
       });
       return;
@@ -70,7 +126,7 @@ Page({
 
     if (!wx.cloud) {
       wx.showToast({
-        title: "Cloud not available",
+        title: text.cloudUnavailable,
         icon: "none"
       });
       return;
@@ -78,7 +134,7 @@ Page({
 
     this.setData({
       busy: true,
-      statusNote: "Creating a WeChat Pay order..."
+      statusNote: text.createOrder
     });
 
     try {
@@ -93,23 +149,23 @@ Page({
 
       const payload = orderResult.result || {};
       if (!payload.payment || !payload.outTradeNo) {
-        throw new Error(payload.message || "Payment parameters were not returned.");
+        throw new Error(payload.message || text.paymentNotReturned);
       }
 
       await this.requestPayment(payload.payment);
 
       this.setData({
-        statusNote: "Verifying payment status..."
+        statusNote: text.verifyPayment
       });
 
       const verified = await this.verifyPayment(payload.outTradeNo, amountFen);
       if (!verified) {
         wx.showToast({
-          title: "Payment pending",
+          title: text.pendingToast,
           icon: "none"
         });
         this.setData({
-          statusNote: "Payment is still pending. Check the merchant order status."
+          statusNote: text.pendingNote
         });
         return;
       }
@@ -118,7 +174,7 @@ Page({
         url: `/pages/thanks/thanks?amountFen=${amountFen}&tradeNo=${payload.outTradeNo}`
       });
     } catch (error) {
-      const message = error && error.message ? error.message : "Payment failed";
+      const message = error && error.message ? error.message : text.paymentFailed;
       if (message !== "PAYMENT_CANCELLED") {
         wx.showToast({
           title: message,
@@ -127,10 +183,7 @@ Page({
       }
 
       this.setData({
-        statusNote:
-          message === "PAYMENT_CANCELLED"
-            ? "Payment was cancelled."
-            : message
+        statusNote: message === "PAYMENT_CANCELLED" ? text.cancelled : message
       });
     } finally {
       this.setData({
@@ -162,7 +215,7 @@ Page({
             return;
           }
 
-          reject(new Error("WeChat Pay did not complete."));
+          reject(new Error(this.data.text.paymentIncomplete));
         }
       });
     });

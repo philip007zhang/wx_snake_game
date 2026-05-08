@@ -1,23 +1,48 @@
 <view class="shell">
-  <view class="card hero">
-    <view class="hero-copy">
-      <text class="hero-title">Snake Support</text>
-      <text class="subtitle muted">Play inside WeChat, beat your best score, and support the project with a WeChat Pay donation.</text>
+  <view wx:if="{{entryPopupVisible}}" class="popup-overlay">
+    <view class="popup-card card">
+      <text class="popup-copy">{{entryPopupMessage}}</text>
+      <button class="primary-btn popup-btn" bindtap="closeEntryPopup">{{text.ok}}</button>
     </view>
+  </view>
 
-    <view class="stats">
-      <view class="stat">
-        <text class="stat-label muted">Score</text>
-        <text class="stat-value">{{score}}</text>
+  <view class="card hero">
+    <view class="language-switch">
+      <text class="muted switch-label">{{commonText.language}}</text>
+      <view class="switch-options">
+        <block wx:for="{{languageOptions}}" wx:key="code">
+          <view
+            class="switch-chip {{language === item.code ? 'active' : ''}}"
+            data-language="{{item.code}}"
+            bindtap="switchLanguage"
+          >
+            <text>{{item.label}}</text>
+          </view>
+        </block>
       </view>
-      <view class="stat">
-        <text class="stat-label muted">Best</text>
-        <text class="stat-value">{{bestScore}}</text>
+    </view>
+    <view class="stats-row">
+      <view class="inline-stat">
+        <text class="inline-label muted">{{text.level}}</text>
+        <text class="inline-value">{{levelLabel}}</text>
       </view>
-      <view class="stat">
-        <text class="stat-label muted">State</text>
-        <text class="stat-value small">{{gameStateLabel}}</text>
+      <view class="inline-stat">
+        <text class="inline-label muted">{{text.diamonds}}</text>
+        <text class="inline-value">{{diamondsThisLevel}} / {{diamondsTarget}}</text>
       </view>
+      <view class="inline-stat">
+        <text class="inline-label muted">{{text.score}}</text>
+        <text class="inline-value">{{score}}</text>
+      </view>
+      <view class="inline-stat">
+        <text class="inline-label muted">{{text.best}}</text>
+        <text class="inline-value">{{bestScore}}</text>
+      </view>
+    </view>
+    <view class="meta-strip">
+      <text class="muted meta-copy">{{text.state}}: {{gameStateLabel}}</text>
+      <text class="muted meta-copy">{{text.rules}}: {{rulesLabel}}</text>
+      <text class="muted meta-copy">{{text.barriers}}: {{barrierCount}}</text>
     </view>
   </view>
 
@@ -31,29 +56,27 @@
         </view>
       </block>
     </view>
-    <text class="board-hint muted">{{statusText}}</text>
-  </view>
-
-  <view class="actions">
-    <button class="primary-btn action-btn" bindtap="handleStartPause">{{actionButtonLabel}}</button>
-    <button class="secondary-btn action-btn" bindtap="resetGame">Reset</button>
-    <button class="secondary-btn action-btn" bindtap="goSupport">Donate</button>
   </view>
 
   <view class="card controls">
-    <text class="section-title">Controls</text>
-    <view class="dpad">
-      <button class="secondary-btn pad up" data-direction="up" bindtap="turn">Up</button>
-      <view class="middle-row">
-        <button class="secondary-btn pad" data-direction="left" bindtap="turn">Left</button>
-        <button class="secondary-btn pad" data-direction="down" bindtap="turn">Down</button>
-        <button class="secondary-btn pad" data-direction="right" bindtap="turn">Right</button>
+    <view class="box-pad">
+      <view class="box-pad-shell">
+        <button class="pad-box pad-up" data-direction="up" bindtap="turn">{{text.up}}</button>
+        <button class="pad-box pad-left" data-direction="left" bindtap="turn">{{text.left}}</button>
+        <button class="pad-box pad-right" data-direction="right" bindtap="turn">{{text.right}}</button>
+        <button class="pad-box pad-down" data-direction="down" bindtap="turn">{{text.down}}</button>
       </view>
     </view>
   </view>
 
+  <view class="actions">
+    <button class="primary-btn action-btn" bindtap="handleStartPause">{{actionButtonLabel}}</button>
+    <button class="secondary-btn action-btn" bindtap="resetGame">{{text.reset}}</button>
+    <button class="secondary-btn action-btn" bindtap="goSupport">{{text.donate}}</button>
+  </view>
+
   <view class="card support-banner" bindtap="goSupport">
-    <text class="section-title">Support this mini-program</text>
-    <text class="muted">Open the donation page to test WeChat Pay support tiers and custom amounts.</text>
+    <text class="section-title">{{commonText.supportBannerTitle}}</text>
+    <text class="muted">{{commonText.supportBannerText}}</text>
   </view>
 </view>

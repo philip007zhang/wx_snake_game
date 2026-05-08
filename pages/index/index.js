@@ -1,11 +1,25 @@
+const {
+  LANGUAGE_OPTIONS,
+  formatText,
+  getLanguage,
+  getPageText,
+  setLanguage
+} = require("../../utils/i18n");
+
 const GRID_SIZE = 12;
 const TICK_MS = 220;
+const DIAMONDS_PER_LEVEL = 6;
 const DIRECTIONS = {
   up: { x: 0, y: -1 },
   down: { x: 0, y: 1 },
   left: { x: -1, y: 0 },
   right: { x: 1, y: 0 }
 };
+const START_SNAKE = [
+  { x: 4, y: 6 },
+  { x: 3, y: 6 },
+  { x: 2, y: 6 }
+];
 
 function createEmptyBoard() {
   return Array.from({ length: GRID_SIZE }, (_, rowIndex) => ({
@@ -21,48 +35,175 @@ function randomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+function cloneSnake() {
+  return START_SNAKE.map((segment) => ({ x: segment.x, y: segment.y }));
+}
+
+function createKey(x, y) {
+  return `${x}-${y}`;
+}
+
+function createReservedStartZone() {
+  const reserved = new Set();
+
+  for (let y = 4; y <= 8; y += 1) {
+    for (let x = 1; x <= 6; x += 1) {
+      reserved.add(createKey(x, y));
+    }
+  }
+
+  return reserved;
+}
+
 Page({
   data: {
     board: createEmptyBoard(),
     score: 0,
     bestScore: 0,
+    levelLabel: "Entry",
+    diamondsThisLevel: 0,
+    diamondsTarget: DIAMONDS_PER_LEVEL,
+    barrierCount: 0,
+    rulesLabel: "Wraparound",
     gameState: "idle",
     gameStateLabel: "Ready",
-    statusText: "Tap Start, then steer with the buttons below.",
-    actionButtonLabel: "Start"
+    actionButtonLabel: "Start",
+    entryPopupVisible: false,
+    entryPopupMessage: "",
+    language: "en",
+    languageOptions: LANGUAGE_OPTIONS,
+    commonText: {},
+    text: {}
   },
 
   onLoad() {
+    this.language = getLanguage();
+    this.applyLanguage();
     const bestScore = wx.getStorageSync("snake-best-score") || 0;
     this.bestScore = bestScore;
     this.resetGame();
+  },
+
+  onShow() {
+    const latestLanguage = getLanguage();
+    if (latestLanguage !== this.language) {
+      this.language = latestLanguage;
+      this.applyLanguage();
+      this.refreshLanguageSensitiveData();
+    }
   },
 
   onUnload() {
     this.stopTimer();
   },
 
+  applyLanguage() {
+    const locale = getPageText(this.language, "index");
+    const app = getApp();
+    app.globalData.language = this.language;
+    wx.setNavigationBarTitle({
+      title: locale.page.navTitle
+    });
+    this.setData({
+      language: this.language,
+      languageOptions: LANGUAGE_OPTIONS,
+      commonText: locale.common,
+      text: locale.page
+    });
+  },
+
+  switchLanguage(event) {
+    const nextLanguage = event.currentTarget.dataset.language;
+    if (!nextLanguage || nextLanguage === this.language) {
+      return;
+    }
+
+    this.language = setLanguage(nextLanguage);
+    this.applyLanguage();
+    this.refreshLanguageSensitiveData();
+  },
+
+  refreshLanguageSensitiveData() {
+    const text = this.data.text;
+    this.setData({
+      levelLabel: this.levelIndex === 0 ? text.entry : String(this.levelIndex),
+      rulesLabel: this.levelIndex === 0 ? text.wraparound : text.wallsStones,
+      gameStateLabel: this.getGameStateLabel(this.data.gameState),
+      actionButtonLabel: this.getActionButtonLabel(this.data.gameState),
+      entryPopupMessage: text.popupEntry
+    });
+  },
+
+  getGameStateLabel(gameState) {
+    const text = this.data.text;
+    if (gameState === "running") {
+      return text.live;
+    }
+    if (gameState === "paused") {
+      return text.paused;
+    }
+    if (gameState === "over") {
+      return text.gameOver;
+    }
+    return text.ready;
+  },
+
+  getActionButtonLabel(gameState) {
+    const text = this.data.text;
+    if (gameState === "running") {
+      return text.pause;
+    }
+    if (gameState === "paused") {
+      return text.resume;
+    }
+    if (gameState === "over") {
+      return text.restart;
+    }
+    return text.start;
+  },
+
   resetGame() {
     this.stopTimer();
+    this.totalScore = 0;
+    this.setupLevel(0, {
+      gameState: "idle"
+    });
+  },
 
-    this.snake = [
-      { x: 4, y: 6 },
-      { x: 3, y: 6 },
-      { x: 2, y: 6 }
-    ];
+  setupLevel(levelIndex, options = {}) {
+    this.levelIndex = levelIndex;
+    this.barrierUnitCount = levelIndex;
+    this.snake = cloneSnake();
     this.direction = "right";
     this.nextDirection = "right";
     this.canTurn = true;
-    this.food = this.spawnFood(this.snake);
+    this.barriers = this.generateBarriers(levelIndex);
+    this.barrierKeys = new Set(this.barriers.map((cell) => createKey(cell.x, cell.y)));
+    this.diamondsThisLevel = 0;
+    this.food = this.spawnFood(this.snake, this.barrierKeys);
+
+    const gameState = options.gameState || this.data.gameState || "idle";
 
     this.setData({
-      board: this.renderBoard(this.snake, this.food),
-      score: 0,
+      board: this.renderBoard(this.snake, this.food, this.barriers),
+      score: this.totalScore || 0,
       bestScore: this.bestScore || 0,
-      gameState: "idle",
-      gameStateLabel: "Ready",
-      statusText: "Tap Start, then steer with the buttons below.",
-      actionButtonLabel: "Start"
+      levelLabel: levelIndex === 0 ? this.data.text.entry : String(levelIndex),
+      diamondsThisLevel: 0,
+      diamondsTarget: DIAMONDS_PER_LEVEL,
+      barrierCount: levelIndex,
+      rulesLabel: levelIndex === 0 ? this.data.text.wraparound : this.data.text.wallsStones,
+      gameState,
+      gameStateLabel: this.getGameStateLabel(gameState),
+      actionButtonLabel: this.getActionButtonLabel(gameState),
+      entryPopupVisible: levelIndex === 0,
+      entryPopupMessage: this.data.text.popupEntry
+    });
+  },
+
+  closeEntryPopup() {
+    this.setData({
+      entryPopupVisible: false
     });
   },
 
@@ -71,9 +212,8 @@ Page({
       this.stopTimer();
       this.setData({
         gameState: "paused",
-        gameStateLabel: "Paused",
-        statusText: "Paused. Tap Start to keep going.",
-        actionButtonLabel: "Resume"
+        gameStateLabel: this.data.text.paused,
+        actionButtonLabel: this.data.text.resume
       });
       return;
     }
@@ -85,9 +225,8 @@ Page({
     this.startTimer();
     this.setData({
       gameState: "running",
-      gameStateLabel: "Live",
-      statusText: "Catch the glowing tile and avoid the walls.",
-      actionButtonLabel: "Pause"
+      gameStateLabel: this.data.text.live,
+      actionButtonLabel: this.data.text.pause
     });
   },
 
@@ -144,28 +283,22 @@ Page({
     this.direction = this.nextDirection;
     const head = this.snake[0];
     const vector = DIRECTIONS[this.direction];
-    const nextHead = {
-      x: head.x + vector.x,
-      y: head.y + vector.y
-    };
-    const grew = nextHead.x === this.food.x && nextHead.y === this.food.y;
+    const nextHead = this.getNextHead(head, vector);
+    const grew = this.food && nextHead.x === this.food.x && nextHead.y === this.food.y;
     const occupiedSegments = grew ? this.snake : this.snake.slice(0, -1);
 
-    const hitsWall =
-      nextHead.x < 0 ||
-      nextHead.y < 0 ||
-      nextHead.x >= GRID_SIZE ||
-      nextHead.y >= GRID_SIZE;
+    const hitsWall = nextHead.outOfBounds;
     const hitsSelf = occupiedSegments.some(
       (segment) => segment.x === nextHead.x && segment.y === nextHead.y
     );
+    const hitsBarrier = this.barrierKeys.has(createKey(nextHead.x, nextHead.y));
 
-    if (hitsWall || hitsSelf) {
-      this.finishGame();
+    if (hitsWall || hitsSelf || hitsBarrier) {
+      this.finishGame(hitsBarrier ? this.data.text.crashBarrier : this.data.text.crashGeneric);
       return;
     }
 
-    const nextSnake = [nextHead].concat(this.snake);
+    const nextSnake = [{ x: nextHead.x, y: nextHead.y }].concat(this.snake);
 
     if (!grew) {
       nextSnake.pop();
@@ -173,45 +306,148 @@ Page({
 
     this.snake = nextSnake;
     if (grew) {
-      this.food = this.spawnFood(nextSnake);
-      const nextScore = this.data.score + 1;
-      const bestScore = Math.max(this.bestScore || 0, nextScore);
-      this.bestScore = bestScore;
-      wx.setStorageSync("snake-best-score", bestScore);
-      this.setData({
-        score: nextScore,
-        bestScore,
-        statusText: "Nice run. Keep the streak alive."
-      });
+      this.handleDiamondCollected(nextSnake);
+      return;
     }
 
     this.canTurn = true;
     this.setData({
-      board: this.renderBoard(this.snake, this.food)
+      board: this.renderBoard(this.snake, this.food, this.barriers)
+    });
+  },
+
+  getNextHead(head, vector) {
+    let x = head.x + vector.x;
+    let y = head.y + vector.y;
+
+    if (this.levelIndex === 0) {
+      if (x < 0) {
+        x = GRID_SIZE - 1;
+      } else if (x >= GRID_SIZE) {
+        x = 0;
+      }
+
+      if (y < 0) {
+        y = GRID_SIZE - 1;
+      } else if (y >= GRID_SIZE) {
+        y = 0;
+      }
+
+      return {
+        x,
+        y,
+        outOfBounds: false
+      };
+    }
+
+    return {
+      x,
+      y,
+      outOfBounds: x < 0 || y < 0 || x >= GRID_SIZE || y >= GRID_SIZE
+    };
+  },
+
+  handleDiamondCollected(nextSnake) {
+    this.totalScore += 1;
+    this.diamondsThisLevel += 1;
+
+    const bestScore = Math.max(this.bestScore || 0, this.totalScore);
+    this.bestScore = bestScore;
+    wx.setStorageSync("snake-best-score", bestScore);
+
+    if (this.diamondsThisLevel >= DIAMONDS_PER_LEVEL) {
+      this.advanceToNextLevel();
+      return;
+    }
+
+    this.food = this.spawnFood(nextSnake, this.barrierKeys);
+    this.canTurn = true;
+    this.setData({
+      score: this.totalScore,
+      bestScore,
+      diamondsThisLevel: this.diamondsThisLevel,
+      board: this.renderBoard(this.snake, this.food, this.barriers)
+    });
+  },
+
+  advanceToNextLevel() {
+    const nextLevel = this.levelIndex + 1;
+    const text = this.data.text;
+
+    wx.showToast({
+      title:
+        this.levelIndex === 0
+          ? text.entryCleared
+          : formatText(text.levelCleared, { level: this.levelIndex }),
+      icon: "success"
+    });
+
+    this.setupLevel(nextLevel, {
+      gameState: "running"
     });
   },
 
   finishGame() {
+    const bestScore = Math.max(this.bestScore || 0, this.totalScore || 0);
     this.stopTimer();
-    const bestScore = Math.max(this.bestScore || 0, this.data.score);
     this.bestScore = bestScore;
     wx.setStorageSync("snake-best-score", bestScore);
     this.setData({
       bestScore,
       gameState: "over",
-      gameStateLabel: "Game Over",
-      statusText: "You crashed. Reset or donate to support the game.",
-      actionButtonLabel: "Restart"
+      gameStateLabel: this.data.text.gameOver,
+      actionButtonLabel: this.data.text.restart
     });
   },
 
-  spawnFood(snake) {
-    const occupied = new Set(snake.map((segment) => `${segment.x}-${segment.y}`));
+  generateBarriers(levelIndex) {
+    if (levelIndex <= 0) {
+      return [];
+    }
+
+    const barriers = [];
+    const occupied = createReservedStartZone();
+
+    for (let index = 0; index < levelIndex; index += 1) {
+      let placed = false;
+
+      for (let attempt = 0; attempt < 200 && !placed; attempt += 1) {
+        const horizontal = Math.random() < 0.5;
+        const length = 2 + randomInt(2);
+        const startX = horizontal ? randomInt(GRID_SIZE - length + 1) : randomInt(GRID_SIZE);
+        const startY = horizontal ? randomInt(GRID_SIZE) : randomInt(GRID_SIZE - length + 1);
+        const cells = [];
+
+        for (let offset = 0; offset < length; offset += 1) {
+          const x = horizontal ? startX + offset : startX;
+          const y = horizontal ? startY : startY + offset;
+          cells.push({ x, y });
+        }
+
+        const blocked = cells.some((cell) => occupied.has(createKey(cell.x, cell.y)));
+        if (blocked) {
+          continue;
+        }
+
+        cells.forEach((cell) => {
+          occupied.add(createKey(cell.x, cell.y));
+          barriers.push(cell);
+        });
+        placed = true;
+      }
+    }
+
+    return barriers;
+  },
+
+  spawnFood(snake, barrierKeys) {
+    const occupied = new Set(snake.map((segment) => createKey(segment.x, segment.y)));
+    barrierKeys.forEach((key) => occupied.add(key));
     const candidates = [];
 
     for (let y = 0; y < GRID_SIZE; y += 1) {
       for (let x = 0; x < GRID_SIZE; x += 1) {
-        const key = `${x}-${y}`;
+        const key = createKey(x, y);
         if (!occupied.has(key)) {
           candidates.push({ x, y });
         }
@@ -219,14 +455,18 @@ Page({
     }
 
     if (candidates.length === 0) {
-      return { x: randomInt(GRID_SIZE), y: randomInt(GRID_SIZE) };
+      return null;
     }
 
     return candidates[randomInt(candidates.length)];
   },
 
-  renderBoard(snake, food) {
+  renderBoard(snake, food, barriers) {
     const board = createEmptyBoard();
+
+    barriers.forEach((barrier) => {
+      board[barrier.y].cells[barrier.x].type = "barrier";
+    });
 
     snake.forEach((segment, index) => {
       board[segment.y].cells[segment.x].type = index === 0 ? "head" : "body";

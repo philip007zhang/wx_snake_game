@@ -1,3 +1,5 @@
+const { getLanguage } = require("./utils/i18n");
+
 App({
   onLaunch() {
     if (wx.cloud) {
@@ -5,8 +7,11 @@ App({
         traceUser: true
       });
     }
+
+    this.globalData.language = getLanguage();
   },
   globalData: {
-    appName: "Snake Support"
+    appName: "Snake Support",
+    language: "en"
   }
 });

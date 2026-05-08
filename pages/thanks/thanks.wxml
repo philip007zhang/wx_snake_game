@@ -1,13 +1,28 @@
 <view class="shell">
+  <view class="language-switch">
+    <text class="muted switch-label">{{commonText.language}}</text>
+    <view class="switch-options">
+      <block wx:for="{{languageOptions}}" wx:key="code">
+        <view
+          class="switch-chip {{language === item.code ? 'active' : ''}}"
+          data-language="{{item.code}}"
+          bindtap="switchLanguage"
+        >
+          <text>{{item.label}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
   <view class="card thank-you">
-    <text class="hero-title">Thank you</text>
-    <text class="muted copy">Your support helps keep this WeChat Mini Program improving.</text>
+    <text class="hero-title">{{text.title}}</text>
+    <text class="muted copy">{{text.copy}}</text>
 
     <view class="receipt">
-      <text class="receipt-line">Amount: ¥{{amountYuan}}</text>
-      <text class="receipt-line">Order: {{tradeNo}}</text>
+      <text class="receipt-line">{{text.amount}}: {{commonText.currency}}{{amountYuan}}</text>
+      <text class="receipt-line">{{text.order}}: {{tradeNo}}</text>
     </view>
 
-    <button class="primary-btn cta" bindtap="playAgain">Back To Game</button>
+    <button class="primary-btn cta" bindtap="playAgain">{{text.back}}</button>
   </view>
 </view>

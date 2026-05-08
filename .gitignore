@@ -6,6 +6,7 @@ miniprogram_npm/
 
 .idea/
 .vscode/
+project.private.config.json
 
 dist/
 coverage/

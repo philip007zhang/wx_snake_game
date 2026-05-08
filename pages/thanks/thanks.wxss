@@ -1,3 +1,39 @@
+.language-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.switch-label {
+  font-size: 22rpx;
+}
+
+.switch-options {
+  display: flex;
+  gap: 10rpx;
+}
+
+.switch-chip {
+  min-width: 82rpx;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2rpx solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  text-align: center;
+  font-size: 22rpx;
+  box-sizing: border-box;
+}
+
+.switch-chip.active {
+  background: linear-gradient(135deg, #22c55e, #14b8a6);
+  border-color: transparent;
+  color: #04111f;
+  font-weight: 700;
+}
+
 .thank-you {
   margin-top: 120rpx;
   padding: 40rpx 32rpx;

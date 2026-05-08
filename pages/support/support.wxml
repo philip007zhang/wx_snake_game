@@ -1,15 +1,30 @@
 <view class="shell">
+  <view class="language-switch">
+    <text class="muted switch-label">{{commonText.language}}</text>
+    <view class="switch-options">
+      <block wx:for="{{languageOptions}}" wx:key="code">
+        <view
+          class="switch-chip {{language === item.code ? 'active' : ''}}"
+          data-language="{{item.code}}"
+          bindtap="switchLanguage"
+        >
+          <text>{{item.label}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
   <view class="card support-hero">
-    <text class="hero-title">Support The Game</text>
-    <text class="muted summary">Send a WeChat Pay donation from inside the Mini Program. Your best score today: {{score}}.</text>
+    <text class="hero-title">{{text.title}}</text>
+    <text class="muted summary">{{summaryText}}</text>
   </view>
 
   <view class="card tier-panel">
-    <text class="section-title">Pick a support tier</text>
+    <text class="section-title">{{text.pickTier}}</text>
     <view class="tier-grid">
       <block wx:for="{{tiers}}" wx:key="amountFen">
         <view class="tier {{selectedAmountFen === item.amountFen ? 'selected' : ''}}" data-amount="{{item.amountFen}}" bindtap="selectTier">
-          <text class="tier-amount">¥{{item.amountYuan}}</text>
+          <text class="tier-amount">{{commonText.currency}}{{item.amountYuan}}</text>
           <text class="tier-label">{{item.label}}</text>
           <text class="muted tier-desc">{{item.description}}</text>
         </view>
@@ -18,26 +33,26 @@
   </view>
 
   <view class="card custom-panel">
-    <text class="section-title">Or enter a custom amount</text>
+    <text class="section-title">{{text.customAmount}}</text>
     <input
       class="amount-input"
       type="digit"
-      placeholder="For example 12.88"
+      placeholder="{{text.amountPlaceholder}}"
       value="{{customAmountYuan}}"
       bindinput="handleCustomAmountInput"
     />
-    <text class="muted field-help">Amounts are in CNY and converted to fen before payment.</text>
+    <text class="muted field-help">{{text.amountHelp}}</text>
   </view>
 
   <view class="card note-panel">
-    <text class="section-title">What happens next</text>
-    <text class="muted note-line">1. The cloud function creates a WeChat Pay order.</text>
-    <text class="muted note-line">2. The Mini Program calls `wx.requestPayment`.</text>
-    <text class="muted note-line">3. The app verifies the order status with the merchant API.</text>
+    <text class="section-title">{{text.nextTitle}}</text>
+    <text class="muted note-line">{{text.step1}}</text>
+    <text class="muted note-line">{{text.step2}}</text>
+    <text class="muted note-line">{{text.step3}}</text>
   </view>
 
   <button class="primary-btn donate-btn" loading="{{busy}}" disabled="{{busy}}" bindtap="donateNow">
-    {{busy ? 'Preparing payment...' : 'Donate with WeChat Pay'}}
+    {{busy ? text.preparing : text.donateNow}}
   </button>
 
   <text wx:if="{{statusNote}}" class="status-note muted">{{statusNote}}</text>
